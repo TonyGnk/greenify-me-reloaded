@@ -1,5 +1,6 @@
 package com.example.greenifymereloaded.ui.user_home.views
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.greenifymereloaded.ui.common.shared.RankActivity
 import com.example.greenifymereloaded.ui.common.shared.SharedAppBarType
 import com.example.greenifymereloaded.ui.common.shared.SharedBehavior
 import com.example.greenifymereloaded.ui.common.shared.SharedCard
@@ -25,10 +28,15 @@ fun CitizenPoints(
     targetingLevel: UserLevel,
     animatedPercentInLevel: Float
 ) {
+    val context = LocalContext.current
+
     SharedCard(
         topBarType = SharedAppBarType.Enable("Points"),
         applyHorizontalPadding = false,
-        behavior = SharedBehavior.Clickable(onClick = {})
+        behavior = SharedBehavior.Clickable(onClick = {
+            val intent = Intent(context, RankActivity::class.java)
+            context.startActivity(intent)
+        })
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
