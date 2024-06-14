@@ -24,7 +24,7 @@ import com.example.greenifymereloaded.R
 import com.example.greenifymereloaded.data.di.LocalViewModelFactory
 import com.example.greenifymereloaded.ui.common.shared.SharedAppBar
 import com.example.greenifymereloaded.ui.common.shared.SharedLazyColumn
-import com.example.greenifymereloaded.ui.user_form.views.UserFormActivity
+import com.example.greenifymereloaded.ui.user_form.UserFormActivity
 import com.example.greenifymereloaded.ui.user_home.UserHomeModel
 import com.example.greenifymereloaded.ui.user_home.UserLevel
 

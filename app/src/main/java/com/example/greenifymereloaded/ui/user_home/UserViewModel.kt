@@ -23,16 +23,14 @@ class UserHomeModel @Inject constructor(
     private val _userHomeState = MutableStateFlow(UserPointState(0))
     val userHomeState: StateFlow<UserPointState> = _userHomeState
 
-    private val _account = MutableStateFlow(Account("1", 0))
-    //val animatedState: MutableStateFlow<Float> = MutableStateFlow(0f)
-
+    private val _account = MutableStateFlow(Account("1", 0, ""))
 
     init {
         viewModelScope.launch {
             userPreferences.userId.collect {
                 println("User id: $it")
                 if (it.isBlank()) return@collect
-                _account.value = userDaoRepository.getAccount(it) ?: Account("1", 0)
+                _account.value = userDaoRepository.getAccount(it) ?: Account("1", 0, "")
                 _userHomeState.update { state ->
                     state.copy(
                         points = _account.value.points
@@ -41,10 +39,6 @@ class UserHomeModel @Inject constructor(
             }
         }
 
-//        viewModelScope.launch {
-//            delay(400)
-//            animatedState.value = _userHomeState.value.percentInLevel
-//        }
 
         viewModelScope.launch {
             delay(300)
@@ -55,7 +49,6 @@ class UserHomeModel @Inject constructor(
             _userHomeState.update {
                 it.copy(greetingText = R.string.app_name)
             }
-            //greetingAnimationPlayedUser = true
         }
     }
 

@@ -2,6 +2,8 @@ package com.example.greenifymereloaded.data.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.greenifymereloaded.ui.admin.home.AdminHomeViewModel
+import com.example.greenifymereloaded.ui.admin.notifications.AdminNotificationViewModel
 import com.example.greenifymereloaded.ui.common.AppViewModel
 import com.example.greenifymereloaded.ui.login.LoginViewModel
 import com.example.greenifymereloaded.ui.user_form.UserFormModel
@@ -30,6 +32,11 @@ abstract class ViewModelModule {
 
     @Binds
     @IntoMap
+    @ViewModelKey(AdminHomeViewModel::class)
+    abstract fun bindAdminHomeViewModel(adminHomeViewModel: AdminHomeViewModel): ViewModel
+
+    @Binds
+    @IntoMap
     @ViewModelKey(UserFormModel::class)
     abstract fun bindUserFormModel(userFormModel: UserFormModel): ViewModel
 
@@ -37,6 +44,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(AppViewModel::class)
     abstract fun bindAppViewModel(appViewModel: AppViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AdminNotificationViewModel::class)
+    abstract fun bindAdminNotificationViewModel(adminNotificationViewModel: AdminNotificationViewModel): ViewModel
 }
 
 @MustBeDocumented
