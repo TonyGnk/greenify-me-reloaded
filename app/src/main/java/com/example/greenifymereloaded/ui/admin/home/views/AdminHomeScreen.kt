@@ -24,12 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.greenifymereloaded.ui.admin.home.views.charts.RankChart
 import com.example.greenifymereloaded.R
 import com.example.greenifymereloaded.data.di.LocalViewModelFactory
 import com.example.greenifymereloaded.ui.admin.home.AdminHomeViewModel
 import com.example.greenifymereloaded.ui.admin.home.views.charts.PieChart
 import com.example.greenifymereloaded.ui.admin.home.views.charts.PointDistribution
+import com.example.greenifymereloaded.ui.admin.home.views.charts.RankChart
 import com.example.greenifymereloaded.ui.admin.notifications.AdminNotificationsActivity
 import com.example.greenifymereloaded.ui.common.shared.SharedLazyColumn
 import com.example.greenifymereloaded.ui.user_form.views.CategoriesGrid
