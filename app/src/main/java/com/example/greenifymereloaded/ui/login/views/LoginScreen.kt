@@ -1,6 +1,8 @@
 package com.example.greenifymereloaded.ui.login.views
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -9,6 +11,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,12 +20,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,40 +58,60 @@ import com.example.greenifymereloaded.ui.login.LoginViewModel
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: LoginViewModel = viewModel(factory = LocalViewModelFactory.current)
+    model: LoginViewModel = viewModel(factory = LocalViewModelFactory.current)
 ) {
     val context = LocalContext.current as Activity
 
-    val state by viewModel.state.collectAsState()
-    //var email by remember { mutableStateOf("") }
-    //var password by remember { mutableStateOf("") }
+    val state by model.state.collectAsState()
+    val showInfoDialog by model.showDialog.collectAsState()
 
     LaunchedEffect(state) {
         if (state is LoginState.LoginSuccess) {
-            navController.navigate("user") {
-                popUpTo("login") { inclusive = true }
+            when ((state as LoginState.LoginSuccess).isAdmin) {
+                true -> {
+                    navController.navigate("admin") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+
+                false -> {
+                    navController.navigate("user") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
             }
         }
     }
 
     LoginScreenContentPortrait(
         signWithGoogle = {
-            viewModel.intentChannel.trySend(
+            model.intentChannel.trySend(
                 LoginIntent.SignInWithGoogle(context)
             )
         },
         signWithGithub = {
-            viewModel.intentChannel.trySend(
+            model.intentChannel.trySend(
                 LoginIntent.SignInWithGitHub(context)
             )
+        },
+        signInWithEmail = {
+            navController.navigate("login_Email")
+        },
+        openDialog = {
+            model.showDialog()
         }
     )
+
+    if (showInfoDialog) Dialog(model::dialogDismissed)
+
 }
 
 @Composable
 fun LoginScreenContentPortrait(
     signWithGoogle: () -> Unit = {},
-    signWithGithub: () -> Unit = {}
+    signWithGithub: () -> Unit = {},
+    signInWithEmail: () -> Unit = {},
+    openDialog: () -> Unit = {}
 ) {
     SharedColumn {
         Column(
@@ -95,7 +122,7 @@ fun LoginScreenContentPortrait(
                 )
                 .fillMaxWidth()
         ) {
-            TopSection(modifier = Modifier.weight(1f))
+            TopSection(modifier = Modifier.weight(1f), openDialog)
             Spacer(modifier = Modifier.height(16.dp))
             AuthenticationProviderWidget(
                 label = "Continue with Google",
@@ -139,64 +166,13 @@ fun LoginScreenContentPortrait(
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(vertical = 7.dp)
                     )
-                }
+                },
+                onClick = signInWithEmail
             )
             Spacer(modifier = Modifier.height(16.dp))
             Spacer(modifier = Modifier.weight(1f))
         }
     }
-    //    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        TextField(
-//            value = email,
-//            onValueChange = { email = it },
-//            label = { Text("Email") }
-//        )
-//        Spacer(modifier = Modifier.height(8.dp))
-//        TextField(
-//            value = password,
-//            onValueChange = { password = it },
-//            label = { Text("Password") },
-//            visualTransformation = PasswordVisualTransformation()
-//        )
-//        Spacer(modifier = Modifier.height(16.dp))
-//        Button(onClick = { viewModel.intentChannel.trySend(LoginIntent.Login(email, password)) }) {
-//            Text("Login")
-//        }
-//        Spacer(modifier = Modifier.height(8.dp))
-//        Button(onClick = { navController.navigate("register") }) {
-//            Text("Register")
-//        }
-//        Spacer(modifier = Modifier.height(8.dp))
-//        Button(onClick = { viewModel.intentChannel.trySend(LoginIntent.SignInWithGoogle(context)) }) {
-//            Text("Sign In with Google")
-//        }
-//        Spacer(modifier = Modifier.height(16.dp))
-//        when (state) {
-//            is LoginState.Idle -> {}
-//            is LoginState.Loading -> CircularProgressIndicator()
-//            is LoginState.LoginSuccess -> {
-//                Text(text = (state as LoginState.LoginSuccess).message)
-//            }
-//
-//            is LoginState.LoginError -> {
-//                Text(text = (state as LoginState.LoginError).error)
-//            }
-//
-//            is LoginState.RegisterError -> {
-//                Text(text = (state as LoginState.RegisterError).error)
-//            }
-//
-//            is LoginState.RegisterSuccess -> {
-//                Text(text = (state as LoginState.RegisterSuccess).message)
-//            }
-//        }
-//    }
 }
 
 @Composable
@@ -215,7 +191,7 @@ private fun AuthenticationProviderWidget(
         },
         modifier = Modifier
             .height(50.dp)
-            .width(240.dp)
+            .width(260.dp)
             .clip(CircleShape)
             .border(
                 BorderStroke(
@@ -311,4 +287,60 @@ private sealed class ProviderIconType {
         val lightImage: @Composable () -> Unit,
         val darkImage: @Composable () -> Unit
     ) : ProviderIconType()
+}
+
+/**
+ * @param onDismiss Callback when the dialog is dismissed
+ */
+@Composable
+private fun Dialog(onDismiss: () -> Unit = {}) {
+    val mikevafeiad045 = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mikevafeiad045"))
+    val marinagial = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/marinagial"))
+    val tonyGnk = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/TonyGnk"))
+    val soly02 = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/soly-02"))
+    val mppapad = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mppapad"))
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.landing_page_dialog_app_information)) },
+        text = {
+            LazyColumn {
+                item {
+                    Text(
+                        text = stringResource(R.string.landing_page_greenify_me)
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(18.dp)) }
+                item { DeveloperRow("mikevafeiad045", true, mikevafeiad045) }
+                item { DeveloperRow("marinagial", false, marinagial) }
+                item { DeveloperRow("TonyGnk", true, tonyGnk) }
+                item { DeveloperRow("mppapad", true, mppapad) }
+                item { DeveloperRow("soly-02", false, soly02) }
+            }
+        },
+        confirmButton = { }
+    )
+}
+
+/**
+ * @param name Developer's name
+ * @param isMan Gender indicator for the icon
+ * @param intent Intent to the developer's profile
+ */
+@Composable
+fun DeveloperRow(name: String, isMan: Boolean, intent: Intent) {
+    val context = LocalContext.current
+    TextButton(
+        onClick = { context.startActivity(intent) },
+        contentPadding = PaddingValues(0.dp),
+        modifier = Modifier.height(40.dp)
+    ) {
+        Icon(
+            painter = painterResource(if (isMan) R.drawable.man_head else R.drawable.woman_head),
+            contentDescription = name,
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(8.dp)
+        )
+        Text(name, modifier = Modifier.padding(8.dp))
+    }
 }
