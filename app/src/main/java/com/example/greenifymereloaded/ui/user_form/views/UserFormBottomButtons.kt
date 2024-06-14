@@ -1,7 +1,5 @@
 package com.example.greenifymereloaded.ui.user_form.views
 
-import com.example.greenifymereloaded.R
-
 
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.greenifymereloaded.R
 import com.example.greenifymereloaded.ui.user_form.UserFormModel
 import com.example.greenifymereloaded.ui.user_form.UserFormState
 

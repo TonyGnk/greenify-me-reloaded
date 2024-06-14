@@ -1,27 +1,18 @@
 package com.example.greenifymereloaded.ui.user_form
 
 import android.app.Activity
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.greenifymereloaded.R
 import com.example.greenifymereloaded.data.di.UserPreferences
-import com.example.greenifymereloaded.data.model.Account
-import com.example.greenifymereloaded.data.model.Both
-import com.example.greenifymereloaded.data.model.Form
-import com.example.greenifymereloaded.data.model.Grams
 import com.example.greenifymereloaded.data.model.Material
-import com.example.greenifymereloaded.data.model.Pieces
 import com.example.greenifymereloaded.data.model.RecyclingCategory
 import com.example.greenifymereloaded.data.model.Track
 import com.example.greenifymereloaded.data.repository.UserDaoRepository
 import com.example.greenifymereloaded.data.repository.UserRepository
-import com.example.greenifymereloaded.ui.user_home.UserPointState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import javax.inject.Inject
 
 
@@ -33,20 +24,19 @@ class UserFormModel @Inject constructor(
 
     val state = MutableStateFlow(UserFormState())
 
-    private val _account = MutableStateFlow(Account("1", 0))
-
 
     init {
         viewModelScope.launch {
-            userPreferences.userId.collect {
-                println("User id: $it")
-                if (it.isBlank()) return@collect
-                _account.value = userDaoRepository.getAccount(it) ?: Account("1", 0)
-//                _userHomeState.update { state ->
-//                    state.copy(
-//                        points = _account.value.points
-//                    )
-//                }
+            userPreferences.userId.collect { id ->
+                println("User id: $id")
+                if (id.isBlank()) return@collect
+                state.update { state ->
+                    state.copy(
+                        form = state.form.copy(
+                            accountId = userDaoRepository.getAccount(id)?.id ?: "1"
+                        )
+                    )
+                }
             }
         }
     }
@@ -54,32 +44,22 @@ class UserFormModel @Inject constructor(
     fun quitForm(activity: Activity) = activity.finish()
 
     fun submitForm(activity: Activity) {
-        if (!state.value.askPermission) {
-            state.update { it.copy(askPermission = true) }
-        } else {
-//            val notificationHandler = NotificationHandler(activity)
-//            val text = activity.getString(R.string.user_submit_form, account.name)
-//            val formNotification = NotificationItem.FormNotification(
-//                createdAt = form.value.createdAt,
-//                formId = form.value.formId,
-//                hasViewed = form.value.hasAdminViewed,
-//                accountName = account.name,
-//                accountId = account.accountId
-//            )
-            //notificationHandler.showNewFormNotification(text, useSampleData, formNotification)
+        viewModelScope.launch {
+            userPreferences.loginUserName.collect { name ->
+                Log.d("UserFormModel", "submitForm: $name")
+                userDaoRepository.saveFormAndTracks(
+                    form = state.value.form,
+                    trackList = state.value.trackMaterialsMap.map { it.first },
+                    name = name
+                )
+                activity.finish()
+            }
 
-            //repository.insert(form.value, viewModelScope)
-//            state.value.trackMaterialsMap.forEach {
-//                repository.insert(it.first, viewModelScope)
-//            }
-            activity.finish()
         }
     }
 
     fun onCategorySelected(category: RecyclingCategory) {
         viewModelScope.launch {
-            //userDaoRepository.getMaterialsWithCategory(category.toString()).collect
-            //  { items ->
             state.update {
                 it.copy(
                     materials = userDaoRepository.getMaterialsWithCategory(category.toString()),
@@ -91,15 +71,18 @@ class UserFormModel @Inject constructor(
         }
     }
 
+
     fun selectMaterial(material: Material) {
         state.update {
             it.copy(
                 selectedMaterial = material,
                 dialogDestination = FormDialogDestination.QUANTITY,
-                isGramsSelected = when (material.type) {
-                    is Both -> QuantityType.BOTH_SHOW_GRAMS
-                    is Grams -> QuantityType.ONLY_GRAMS
-                    is Pieces -> QuantityType.ONLY_PIECES
+                isGramsSelected = if (material.type.pointsPerGram != 0.0 && material.type.pointsPerPiece != 0.0) {
+                    QuantityType.BOTH_SHOW_GRAMS
+                } else if (material.type.pointsPerGram != 0.0) {
+                    QuantityType.ONLY_GRAMS
+                } else {
+                    QuantityType.ONLY_PIECES
                 }
             )
         }
@@ -131,10 +114,8 @@ class UserFormModel @Inject constructor(
         val track = Track(
             formId = idOfTrack,
             materialId = material.materialId,
-            //Multiply by points to get the total points
             quantity = givenQuantity?.times(points) ?: 0.0
         )
-        //if field is not empty
         if (givenQuantity != null) state.update {
             it.copy(
                 query = "",
@@ -153,7 +134,6 @@ class UserFormModel @Inject constructor(
                 }
             )
         }
-        //repository.delete(mutableEntry.first, viewModelScope)
     }
 
     fun onDialogQuantityChangeSelection(type: QuantityType) {

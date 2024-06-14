@@ -84,7 +84,7 @@ private fun TrackItem(pair: Pair<Track, Material>, onDelete: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(pair.second.name)
-                    Text(pair.first.quantity.toString())
+                    Text(pair.first.quantity.toOneDigit().toString())
                 }
             },
             modifier = Modifier.clip(CircleShape)

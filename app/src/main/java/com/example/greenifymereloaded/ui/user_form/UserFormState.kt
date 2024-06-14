@@ -1,12 +1,14 @@
 package com.example.greenifymereloaded.ui.user_form
 
 import com.example.greenifymereloaded.R
+import com.example.greenifymereloaded.data.model.Form
 import com.example.greenifymereloaded.data.model.Material
 import com.example.greenifymereloaded.data.model.RecyclingCategory
 import com.example.greenifymereloaded.data.model.Track
 import kotlin.enums.EnumEntries
 
 data class UserFormState(
+    val form: Form = Form(),
     val materials: List<Material> = listOf(),
     val trackToAdd: Track? = null,
     val trackMaterialsMap: List<Pair<Track, Material>> = listOf(),
@@ -21,7 +23,6 @@ data class UserFormState(
     val selectedCategory: RecyclingCategory = RecyclingCategory.PLASTIC,
     val showDialog: Boolean = true,
     val dialogDestination: FormDialogDestination = FormDialogDestination.CATEGORY,
-    val askPermission: Boolean = false,
     val strings: UserFormStrings = UserFormStrings()
 )
 

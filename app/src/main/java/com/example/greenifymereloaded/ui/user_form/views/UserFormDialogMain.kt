@@ -49,18 +49,18 @@ fun UserFormDialogMain(model: UserFormModel, state: UserFormState) {
                     MaterialsList(model, state)
                 },
                 {
-//                    QuantityForm(
-//                        options = state.selectedMaterial.type,
-//                        isGramsSelected = state.isGramsSelected,
-//                        onDialogQuantityChangeSelection = {
-//                            model.onDialogQuantityChangeSelection(
-//                                it
-//                            )
-//                        },
-//                        onDialogQuantityQueryChange = { model.onDialogQuantityQueryChange(it) },
-//                        query = state.query,
-//                        onEnter = { model.addTrack() }
-//                    )
+                    QuantityForm(
+                        options = state.selectedMaterial.type,
+                        isGramsSelected = state.isGramsSelected,
+                        onDialogQuantityChangeSelection = {
+                            model.onDialogQuantityChangeSelection(
+                                it
+                            )
+                        },
+                        onDialogQuantityQueryChange = { model.onDialogQuantityQueryChange(it) },
+                        query = state.query,
+                        onEnter = { model.addTrack() }
+                    )
                 },
                 modifier = Modifier.height(300.dp)
             )
