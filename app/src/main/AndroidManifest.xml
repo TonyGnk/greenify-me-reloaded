@@ -23,11 +23,11 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
         </activity>
-        <activity android:name=".ui.user_form.views.UserFormActivity" />
+        <activity android:name=".ui.user_form.UserFormActivity" />
+        <activity android:name=".ui.admin.notifications.AdminNotificationsActivity" />
+        <activity android:name=".ui.common.shared.RankActivity" />
+        <activity android:name=".ui.admin.AdminLevelActivity" />
         <activity
             android:name="com.google.firebase.auth.internal.GenericIdpActivity"
             android:excludeFromRecents="true"

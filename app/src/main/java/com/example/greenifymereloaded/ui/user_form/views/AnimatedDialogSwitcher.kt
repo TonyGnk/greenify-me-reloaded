@@ -1,7 +1,5 @@
 package com.example.greenifymereloaded.ui.user_form.views
 
-import com.example.greenifymereloaded.ui.user_form.FormDialogDestination
-
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -10,6 +8,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.greenifymereloaded.ui.user_form.FormDialogDestination
 
 /**
  * This composable function is responsible for switching between different dialog destinations with animations.
