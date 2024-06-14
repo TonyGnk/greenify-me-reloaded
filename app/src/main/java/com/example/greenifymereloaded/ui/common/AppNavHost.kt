@@ -7,14 +7,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,8 +18,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.greenifymereloaded.data.di.LocalViewModelFactory
 import com.example.greenifymereloaded.data.di.UserPreferences
+import com.example.greenifymereloaded.data.di.UserType
+import com.example.greenifymereloaded.ui.admin.home.views.AdminHome
+import com.example.greenifymereloaded.ui.login.views.LoginEmailScreen
 import com.example.greenifymereloaded.ui.login.views.LoginScreen
-import com.example.greenifymereloaded.ui.login.views.RegisterScreen
 import com.example.greenifymereloaded.ui.user_home.views.UserScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +46,6 @@ fun AppNavHost(
             )
         )
 
-
     val exitAnimation = slideOutHorizontally(
         targetOffsetX = { 40 },
     ) + fadeOut(
@@ -57,7 +53,6 @@ fun AppNavHost(
             200, easing = FastOutSlowInEasing
         )
     )
-
 
 
     NavHost(
@@ -71,18 +66,17 @@ fun AppNavHost(
         composable("login") {
             LoginScreen(navController)
         }
-        composable("register") {
-            RegisterScreen(navController)
+        composable("login_Email") {
+            LoginEmailScreen(navController)
+        }
+        composable("register_Email") {
+            LoginScreen(navController)
         }
         composable("user") {
             UserScreen(navController)
         }
-        composable("form") {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Red)
-            )
+        composable("admin") {
+            AdminHome(navController)
         }
     }
 }
@@ -99,8 +93,12 @@ class AppViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             Log.d("StartupTiming", "Init  ${System.currentTimeMillis() % 100000}")
-            val isLoggedIn = userPreferences.loginStatus.first()
-            startDestination.value = if (isLoggedIn) "user" else "login"
+            val isLoggedIn = userPreferences.loginAllCombined.first()
+            startDestination.value = when (isLoggedIn) {
+                UserType.USER -> "user"
+                UserType.ADMIN -> "admin"
+                UserType.NONE -> "login"
+            }
             delay(150)
             _isSplashScreenVisible.value = false
             Log.d("StartupTiming", "Ready ${System.currentTimeMillis() % 100000}")

@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.greenifymereloaded"
-        minSdk = 34
+        minSdk = 25
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -78,6 +78,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation(libs.accompanist.permissions)
     implementation(libs.swipe)
+    implementation("com.google.code.gson:gson:2.8.8")
 
 
     // Navigation, ViewModel, Dependency Injection
